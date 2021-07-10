@@ -33,3 +33,5 @@ export const didNotFindHydratableContainerSuspenseInstance = shim;
 export const didNotFindHydratableInstance = shim;
 export const didNotFindHydratableTextInstance = shim;
 export const didNotFindHydratableSuspenseInstance = shim;
+export const supportsMicrotask = false;
+export const getCurrentEventPriority = shim;

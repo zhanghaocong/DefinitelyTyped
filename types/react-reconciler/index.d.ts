@@ -275,10 +275,18 @@ declare namespace ReactReconciler {
          */
         noTimeout: NoTimeout;
 
+        // tslint:disable:max-line-length
         /**
-         * You can proxy this to `queueMicrotask` or its equivalent in your environment.
+         * 
+         * Set this to true to indicate that your renderer supports scheduleMicrotask. We use microtasks as part of our discrete event implementation in React DOM. If you're not sure if your renderer should support this, you probably should. The option to not implement scheduleMicrotask exists so that platforms with more control over user events, like React Native, can choose to use a different mechanism.
          */
-        queueMicrotask(fn: () => void): void;
+        // tslint:enable:max-line-length
+        supportsMicrotask: boolean
+
+        /**
+         * Optional. You can proxy this to queueMicrotask or its equivalent in your environment.
+         */
+        scheduleMicrotask?(fn: () => void): void;
 
         // tslint:disable:max-line-length
         /**
@@ -286,6 +294,41 @@ declare namespace ReactReconciler {
          */
         // tslint:enable:max-line-length
         isPrimaryRenderer: boolean;
+
+        // tslint:disable:max-line-length
+        /**
+         * To implement this method, you'll need some constants available on the special react-reconciler/constants entry point:
+         * 
+         * ```js
+         * import {
+         *   DiscreteEventPriority,
+         *   ContinuousEventPriority,
+         *   DefaultEventPriority,
+         * } from 'react-reconciler/constants';
+         * 
+         * const HostConfig = {
+         *   // ...
+         *   getCurrentEventPriority() {
+         *     return DefaultEventPriority;
+         *   },
+         *   // ...
+         * }
+         * 
+         * const MyRenderer = Reconciler(HostConfig);
+         * ```
+         * 
+         * The constant you return depends on which event, if any, is being handled right now. (In the browser, you can check this using `window.event && window.event.type`).
+         * 
+         * * **Discrete events:** If the active event is _directly caused by the user_ (such as mouse and keyboard events) and _each event in a sequence is intentional_ (e.g. `click`), return `DiscreteEventPriority`. This tells React that they should interrupt any background work and cannot be batched across time.
+         * 
+         * * **Continuous events:** If the active event is _directly caused by the user_ but _the user can't distinguish between individual events in a sequence_ (e.g. `mouseover`), return `ContinuousEventPriority`. This tells React they should interrupt any background work but can be batched across time.
+         * 
+         * * **Other events / No active event:** In all other cases, return `DefaultEventPriority`. This tells React that this event is considered background work, and interactive events will be prioritized over it.
+         * 
+         * You can consult the `getCurrentEventPriority()` implementation in `ReactDOMHostConfig.js` for a reference implementation.
+         */
+        // tslint:enable:max-line-length
+        getCurrentEventPriority (): Lane
 
         // -------------------
         //  Mutation Methods

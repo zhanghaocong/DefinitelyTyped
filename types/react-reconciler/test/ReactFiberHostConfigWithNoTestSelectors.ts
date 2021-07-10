@@ -13,3 +13,5 @@ export const isHiddenSubtree = shim;
 export const matchAccessibilityRole = shim;
 export const setFocusIfFocusable = shim;
 export const setupIntersectionObserver = shim;
+export const supportsMicrotask = false;
+export const getCurrentEventPriority = shim;
